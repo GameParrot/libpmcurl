@@ -5,9 +5,9 @@ Curl library for PocketMine-MP using curl_multi
 
 ```php
 public function onEnable() : void {
-  if (!Curl::getInstance()) {
-    Curl::register($this);
-  }
+	if (!Curl::getInstance()) {
+		Curl::register($this);
+	}
 }
 ```
 
@@ -20,13 +20,13 @@ After initialization, GET requests can be done with `Curl::getInstance()->getReq
 Basic example:
 ```php
 public function onEnable() : void {
-  if (!Curl::getInstance()) {
-    Curl::register($this);
-  }
-  
-  Curl::getInstance()->getRequest("https://example.com", function(?InternetRequestResult $result, ?string $error) : void {
-    var_dump($result, $error);
-  });
+	if (!Curl::getInstance()) {
+		Curl::register($this);
+	}
+
+	Curl::getInstance()->getRequest("https://example.com", function(?InternetRequestResult $result, ?string $error) : void {
+		var_dump($result, $error);
+	});
 }
 ```
 
