@@ -57,34 +57,35 @@ class Curl {
 		$this->pthreadWriter = new PthreadsChannelWriter($mainToThreadBuffer);
 
 		$sleeperEntry = $plugin->getServer()->getTickSleeper()->addNotifier(function () : void {
-			$buf = $this->pthreadReader->read();
-			/** @var CurlResult */
-			$response = igbinary_unserialize($buf);
+			while ($buf = $this->pthreadReader->read()) {
+				/** @var CurlResult */
+				$response = igbinary_unserialize($buf);
 
-			if (!isset($this->requests[$response->id])) {
-				return;
-			}
-			$cb = $this->requests[$response->id];
-			if ($response->curlError !== CURLE_OK) {
-				$cb(null, curl_strerror($response->curlError));
-			} else {
-				$content = $response->raw;
-				$rawHeaders = substr($content, 0, $response->headerSize);
-				$body = substr($content, $response->headerSize);
-				$headers = [];
-				foreach (explode("\r\n\r\n", $rawHeaders) as $rawHeaderGroup) {
-					$headerGroup = [];
-					foreach (explode("\r\n", $rawHeaderGroup) as $line) {
-						$nameValue = explode(":", $line, 2);
-						if (isset($nameValue[1])) {
-							$headerGroup[trim(strtolower($nameValue[0]))] = trim($nameValue[1]);
-						}
-					}
-					$headers[] = $headerGroup;
+				if (!isset($this->requests[$response->id])) {
+					return;
 				}
-				$result = new InternetRequestResult($headers, $body, $response->httpStatus);
-				$cb($result, null);
-				unset($this->requests[$response->id]);
+				$cb = $this->requests[$response->id];
+				if ($response->curlError !== CURLE_OK) {
+					$cb(null, curl_strerror($response->curlError));
+				} else {
+					$content = $response->raw;
+					$rawHeaders = substr($content, 0, $response->headerSize);
+					$body = substr($content, $response->headerSize);
+					$headers = [];
+					foreach (explode("\r\n\r\n", $rawHeaders) as $rawHeaderGroup) {
+						$headerGroup = [];
+						foreach (explode("\r\n", $rawHeaderGroup) as $line) {
+							$nameValue = explode(":", $line, 2);
+							if (isset($nameValue[1])) {
+								$headerGroup[trim(strtolower($nameValue[0]))] = trim($nameValue[1]);
+							}
+						}
+						$headers[] = $headerGroup;
+					}
+					$result = new InternetRequestResult($headers, $body, $response->httpStatus);
+					$cb($result, null);
+					unset($this->requests[$response->id]);
+				}
 			}
 		});
 
@@ -115,4 +116,3 @@ class Curl {
 		$this->pthreadWriter->write(igbinary_serialize($request));
 	}
 }
-
