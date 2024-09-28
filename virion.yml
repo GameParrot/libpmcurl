@@ -1,0 +1,7 @@
+name: libpmcurl
+authors:
+  - GameParrot
+antigen: gameparrot\libpmcurl
+version: 1.0.0
+api:
+  - 5.0.0
