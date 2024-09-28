@@ -3,27 +3,17 @@ Curl library for PocketMine-MP using curl_multi
 
 # Initialization
 
-```php
-public function onEnable() : void {
-	if (!Curl::getInstance()) {
-		Curl::register($this);
-	}
-}
-```
+libpmcurl uses SingletonTrait so it it automatically initialized when `Curl::getInstance()` is called for the first time
 
 # Usage
 
-After initialization, GET requests can be done with `Curl::getInstance()->getRequest("https://example.com", function(?InternetRequestResult $result, ?string $error) {})` and POST requests can be done with `Curl::getInstance()->postRequest("https://example.com", function(?InternetRequestResult $result, ?string $error) {}, ["headers"], "body")`
+GET requests can be done with `Curl::getInstance()->getRequest("https://example.com", function(?InternetRequestResult $result, ?string $error) {})` and POST requests can be done with `Curl::getInstance()->postRequest("https://example.com", function(?InternetRequestResult $result, ?string $error) {}, ["headers"], "body")`
 
 # Examples
 
 Basic example:
 ```php
 public function onEnable() : void {
-	if (!Curl::getInstance()) {
-		Curl::register($this);
-	}
-
 	Curl::getInstance()->getRequest("https://example.com", function(?InternetRequestResult $result, ?string $error) : void {
 		var_dump($result, $error);
 	});
@@ -35,9 +25,6 @@ Discord webhook example:
 ```php
 class Main extends PluginBase implements Listener {
 	public function onEnable() : void {
-		if (!Curl::getInstance()) {
-			Curl::register($this);
-		}
 		$this->getServer()->getPluginManager()->registerEvents($this, $this);
 	}
 

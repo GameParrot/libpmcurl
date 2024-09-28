@@ -7,8 +7,9 @@ namespace gameparrot\libpmcurl;
 use pmmp\thread\ThreadSafeArray;
 use pocketmine\network\mcpe\raklib\PthreadsChannelReader;
 use pocketmine\network\mcpe\raklib\PthreadsChannelWriter;
-use pocketmine\plugin\PluginBase;
+use pocketmine\Server;
 use pocketmine\utils\InternetRequestResult;
+use pocketmine\utils\SingletonTrait;
 use function curl_strerror;
 use function explode;
 use function igbinary_serialize;
@@ -22,6 +23,8 @@ use function trim;
 use const PHP_INT_MAX;
 
 class Curl {
+	use SingletonTrait;
+
 	private static bool $packaged;
 	public static function isPackaged() : bool {
 		return self::$packaged;
@@ -30,22 +33,13 @@ class Curl {
 		self::$packaged = __CLASS__ !== 'gameparrot\libpmcurl\Curl';
 	}
 
-	private static self $instance;
-	public static function getInstance() : ?Curl {
-		return self::$instance ?? null;
-	}
-
-	public static function register(PluginBase $plugin) : void {
-		self::$instance = new self($plugin);
-	}
-
 	private CurlThread $thread;
 	private PthreadsChannelReader $pthreadReader;
 	private PthreadsChannelWriter $pthreadWriter;
 
 	private array $requests = [];
 
-	public function __construct(PluginBase $plugin) {
+	public function __construct() {
 		self::detectPackaged();
 
 		/** @phpstan-var ThreadSafeArray<int, string> $mainToThreadBuffer */
@@ -56,7 +50,7 @@ class Curl {
 		$this->pthreadReader = new PthreadsChannelReader($threadToMainBuffer);
 		$this->pthreadWriter = new PthreadsChannelWriter($mainToThreadBuffer);
 
-		$sleeperEntry = $plugin->getServer()->getTickSleeper()->addNotifier(function () : void {
+		$sleeperEntry = Server::getInstance()->getTickSleeper()->addNotifier(function () : void {
 			while ($buf = $this->pthreadReader->read()) {
 				/** @var CurlResult */
 				$response = igbinary_unserialize($buf);
