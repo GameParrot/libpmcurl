@@ -42,7 +42,7 @@ class Main extends PluginBase implements Listener {
 	}
 
 	public function onChat(PlayerChatEvent $event) : void {
-		Curl::getInstance()->postRequest("https://discord.com/api/webhooks/WEBHOOK_ID", function(?InternetRequestResult $result) : void {}, [], ["content" => $event->getMessage(), "username" => $event->getPlayer()->getName()]);
+		Curl::getInstance()->postRequest("https://discord.com/api/webhooks/WEBHOOK_ID", function() : void {}, [], ["content" => $event->getMessage(), "username" => $event->getPlayer()->getName()]);
 	}
 }
 ```
