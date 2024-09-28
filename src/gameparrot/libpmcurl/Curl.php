@@ -16,11 +16,10 @@ use function igbinary_serialize;
 use function igbinary_unserialize;
 use function is_array;
 use function json_encode;
-use function mt_rand;
+use function spl_object_id;
 use function strtolower;
 use function substr;
 use function trim;
-use const PHP_INT_MAX;
 
 class Curl {
 	use SingletonTrait;
@@ -105,7 +104,7 @@ class Curl {
 	}
 
 	public function customRequest(CurlRequest $request, \Closure $cb) : void {
-		$request->id = mt_rand(0, PHP_INT_MAX);
+		$request->id = spl_object_id($cb);
 		$this->requests[$request->id] = $cb;
 		$this->pthreadWriter->write(igbinary_serialize($request));
 	}
