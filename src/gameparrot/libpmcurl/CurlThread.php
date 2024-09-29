@@ -29,6 +29,7 @@ class CurlThread extends Thread {
 	}
 
 	public function onRun() : void {
+		gc_enable();
 		$sleeperNotifier = $this->sleeperEntry->createNotifier();
 		$curlWorker = new CurlWorker(new PthreadsChannelReader($this->mainToThreadBuffer), new SnoozeAwarePthreadsChannelWriter($this->threadToMainBuffer, $sleeperNotifier));
 		while (!$this->isKilled) {
